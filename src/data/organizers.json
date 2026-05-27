@@ -1,0 +1,8 @@
+[
+  { "name": "Jordan Duncan", "title": "ACM President", "avatar": "JD" },
+  { "name": "Aamir Abatiyow", "title": "ACM Vice President", "avatar": "AA" },
+  { "name": "Gibson Nichol", "title": "ACM Treasurer", "avatar": "GN" },
+  { "name": "Andrew Atherton", "title": "ACM Secretary", "avatar": "AA" },
+  { "name": "Lily Wallace", "title": "ACM Outreach Coordinator", "avatar": "LW" },
+  { "name": "Jason James", "title": "ACM Faculty Advisor", "avatar": "JJ" }
+]
