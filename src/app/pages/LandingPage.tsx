@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Calendar, Trophy, Users, ChevronRight, Sparkles, Code2, Zap, Award, Clock, MapPin, ChevronDown, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import organizers from '@/data/organizers.json';
+import { day1, day2 } from '@/data/schedule';
 
 export function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -391,7 +392,7 @@ export function LandingPage() {
               {[
                 { icon: Users, label: "TBD", color: "from-red-500 to-orange-500" }, // "500+ Hackers"
                 { icon: Trophy, label: "TBD", color: "from-orange-500 to-yellow-500" }, // "$10K Prizes"
-                { icon: Clock, label: "TBD", color: "from-yellow-500 to-red-500" }, // "24 Hours"
+                { icon: Clock, label: "24 Hours", color: "from-yellow-500 to-red-500" }, // "24 Hours"
                 { icon: Zap, label: "TBD", color: "from-red-500 to-pink-500" }, // "30+ Mentors"
               ].map((stat, i) => (
                 <motion.div
@@ -472,24 +473,12 @@ export function LandingPage() {
             >
               <h3 className="text-2xl mb-6 text-white">Day 1 - October 3</h3>
               <div className="space-y-4">
-                {/* Schedule TBD - original items preserved below for future use
-                {[
-                  { time: "9:00 AM", event: "Registration & Check-in" },
-                  { time: "10:00 AM", event: "Opening Ceremony" },
-                  { time: "11:00 AM", event: "Hacking Begins!" },
-                  { time: "12:00 PM", event: "Lunch" },
-                  { time: "2:00 PM", event: "Workshop: Intro to AI" },
-                  { time: "6:00 PM", event: "Dinner" },
-                  { time: "8:00 PM", event: "Mini Games & Activities" },
-                  { time: "12:00 AM", event: "Midnight Snacks" },
-                ].map((item, i) => (
+                {day1.map((item, i) => (
                   <div key={i} className="flex items-start gap-4 text-white/90">
-                    <span className="text-white font-mono min-w-24">{item.time}</span>
+                    <span className="text-white font-mono min-w-32 whitespace-nowrap">{item.time}</span>
                     <span>{item.event}</span>
                   </div>
                 ))}
-                */}
-                <p className="text-white/80 italic">TBD - Schedule coming soon</p>
               </div>
             </motion.div>
 
@@ -502,24 +491,12 @@ export function LandingPage() {
             >
               <h3 className="text-2xl mb-6 text-white">Day 2 - October 4</h3>
               <div className="space-y-4">
-                {/* Schedule TBD - original items preserved below for future use
-                {[
-                  { time: "8:00 AM", event: "Breakfast" },
-                  { time: "11:00 AM", event: "Hacking Ends" },
-                  { time: "11:30 AM", event: "Project Submissions Due" },
-                  { time: "12:00 PM", event: "Lunch" },
-                  { time: "1:00 PM", event: "Judging Begins" },
-                  { time: "3:00 PM", event: "Final Presentations" },
-                  { time: "4:30 PM", event: "Awards Ceremony" },
-                  { time: "5:30 PM", event: "Closing & Farewell" },
-                ].map((item, i) => (
+                {day2.map((item, i) => (
                   <div key={i} className="flex items-start gap-4 text-white/90">
-                    <span className="text-white font-mono min-w-24">{item.time}</span>
+                    <span className="text-white font-mono min-w-32 whitespace-nowrap">{item.time}</span>
                     <span>{item.event}</span>
                   </div>
                 ))}
-                */}
-                <p className="text-white/80 italic">TBD - Schedule coming soon</p>
               </div>
             </motion.div>
           </div>
@@ -688,7 +665,7 @@ export function LandingPage() {
             {[
               {
                 q: "Who can participate?",
-                a: "Any college student is welcome! Whether you're a first-time hacker or a seasoned pro, we'd love to have you.",
+                a: 'Any high school or college student is welcome! Whether you\'re a first-time hacker or a seasoned pro, we\'d love to have you.',
               },
               {
                 q: "How much does it cost?",
@@ -696,7 +673,7 @@ export function LandingPage() {
               },
               {
                 q: "What should I bring?",
-                a: "Bring your laptop, charger, and any hardware you want to hack with. Don't forget a valid student ID!",
+                a: "Bring your laptop, charger, and anything else you need to work on your project.",
               },
               {
                 q: "Do I need a team?",
@@ -704,11 +681,11 @@ export function LandingPage() {
               },
               {
                 q: "What can I build?",
-                a: "Anything! Web apps, mobile apps, hardware projects, games, AI/ML projects - the sky's the limit.",
+                a: "Anything! Web apps, mobile apps, games, AI/ML projects, developer tools, and more—the sky's the limit.",
               },
               {
                 q: "Will there be travel reimbursement?",
-                a: "We offer travel reimbursement for students coming from other universities. Details will be sent after registration.",
+                a: "We are not offering travel reimbursement at this time, but we encourage students from all schools to apply and attend.",
               },
             ].map((faq, i) => (
               <FAQItem key={i} faq={faq} index={i} />

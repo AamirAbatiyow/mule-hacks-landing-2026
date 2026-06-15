@@ -31,6 +31,7 @@ import {
   formatAnnouncementTime,
   type StoredAnnouncement,
 } from '@/lib/hackathonStorage';
+import { day1, day2 } from '@/data/schedule';
 
 export function DashboardPage() {
   const [currentView, setCurrentView] = useState('checkin');
@@ -591,16 +592,9 @@ function ResourcesView() {
             <div className="bg-white/5 border border-white/10 rounded-lg p-6">
               <h3 className="text-xl text-white mb-4">Day 1 - October 3</h3>
               <div className="space-y-2">
-                {[
-                  { time: '9:00 AM', event: 'Registration & Check-in' },
-                  { time: '10:00 AM', event: 'Opening Ceremony' },
-                  { time: '11:00 AM', event: 'Hacking Begins!' },
-                  { time: '12:00 PM', event: 'Lunch' },
-                  { time: '2:00 PM', event: 'Workshop: Intro to AI' },
-                  { time: '6:00 PM', event: 'Dinner' },
-                ].map((item, i) => (
+                {day1.map((item, i) => (
                   <div key={i} className="flex justify-between text-sm py-2 border-b border-white/5">
-                    <span className="text-gray-400">{item.time}</span>
+                    <span className="text-gray-400 whitespace-nowrap">{item.time}</span>
                     <span className="text-white">{item.event}</span>
                   </div>
                 ))}
@@ -609,16 +603,9 @@ function ResourcesView() {
             <div className="bg-white/5 border border-white/10 rounded-lg p-6">
               <h3 className="text-xl text-white mb-4">Day 2 - October 4</h3>
               <div className="space-y-2">
-                {[
-                  { time: '8:00 AM', event: 'Breakfast' },
-                  { time: '11:00 AM', event: 'Hacking Ends' },
-                  { time: '12:00 PM', event: 'Lunch' },
-                  { time: '1:00 PM', event: 'Judging Begins' },
-                  { time: '3:00 PM', event: 'Final Presentations' },
-                  { time: '4:30 PM', event: 'Awards Ceremony' },
-                ].map((item, i) => (
+                {day2.map((item, i) => (
                   <div key={i} className="flex justify-between text-sm py-2 border-b border-white/5">
-                    <span className="text-gray-400">{item.time}</span>
+                    <span className="text-gray-400 whitespace-nowrap">{item.time}</span>
                     <span className="text-white">{item.event}</span>
                   </div>
                 ))}
@@ -682,7 +669,7 @@ function ResourcesView() {
             {[
               {
                 q: 'Who can participate?',
-                a: 'Any college student is welcome! Whether you\'re a first-time hacker or a seasoned pro, we\'d love to have you.',
+                a: 'Any high school or college student is welcome! Whether you\'re a first-time hacker or a seasoned pro, we\'d love to have you.',
               },
               {
                 q: 'How much does it cost?',
@@ -690,7 +677,7 @@ function ResourcesView() {
               },
               {
                 q: 'What should I bring?',
-                a: 'Bring your laptop, charger, and any hardware you want to hack with. Don\'t forget a valid student ID!',
+                a: 'Bring your laptop, charger, and anything else you need to work on your project.',
               },
               {
                 q: 'Do I need a team?',
@@ -698,7 +685,7 @@ function ResourcesView() {
               },
               {
                 q: 'What can I build?',
-                a: 'Anything! Web apps, mobile apps, hardware projects, games, AI/ML projects - the sky\'s the limit.',
+                a: 'Anything! Web apps, mobile apps, games, AI/ML projects, developer tools, and more—the sky\'s the limit.',
               },
             ].map((faq, i) => (
               <div key={i} className="bg-white/5 border border-white/10 rounded-lg p-6 hover:bg-red-500/20 hover:border-red-500 transition-all">
