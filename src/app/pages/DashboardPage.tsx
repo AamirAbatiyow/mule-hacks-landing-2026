@@ -765,7 +765,18 @@ function ResourcesView() {
   );
 }
 
+function toProfileUrl(value: string | undefined, baseUrl: string) {
+  const trimmed = value?.trim();
+  if (!trimmed) return "";
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^(www\.|github\.com|linkedin\.com)/i.test(trimmed)) return `https://${trimmed}`;
+  return `${baseUrl}${trimmed}`;
+}
+
 function ProfileView({ user }: { user: any }) {
+  const githubUrl = toProfileUrl(user?.github, "https://github.com/");
+  const linkedinUrl = toProfileUrl(user?.linkedin, "https://linkedin.com/in/");
+
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <h1 className="text-3xl sm:text-4xl text-white">Profile</h1>
@@ -792,6 +803,45 @@ function ProfileView({ user }: { user: any }) {
             <label className="block text-white/80 text-sm mb-1">Year</label>
             <p className="text-white capitalize">{user?.year || 'Not specified'}</p>
           </div>
+          <div>
+            <label className="block text-white/80 text-sm mb-1">Phone</label>
+            <p className="text-white">{user?.phone || 'Not specified'}</p>
+          </div>
+          <div>
+            <label className="block text-white/80 text-sm mb-1">Dietary Restrictions</label>
+            <p className="text-white">{user?.dietaryRestrictions || 'Not specified'}</p>
+          </div>
+          <div>
+            <label className="block text-white/80 text-sm mb-1">T-shirt Size</label>
+            <p className="text-white">{user?.shirtSize || 'Not specified'}</p>
+          </div>
+          {(githubUrl || linkedinUrl) && (
+            <div>
+              <label className="block text-white/80 text-sm mb-2">Links</label>
+              <div className="flex flex-wrap gap-3">
+                {githubUrl && (
+                  <a
+                    href={githubUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg px-3 py-2 transition-colors"
+                  >
+                    GitHub <ExternalLink className="w-4 h-4" />
+                  </a>
+                )}
+                {linkedinUrl && (
+                  <a
+                    href={linkedinUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg px-3 py-2 transition-colors"
+                  >
+                    LinkedIn <ExternalLink className="w-4 h-4" />
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

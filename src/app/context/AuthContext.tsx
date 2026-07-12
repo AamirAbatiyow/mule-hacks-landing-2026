@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode, useMemo, useRef, useEffect } from 'react';
+import { sendConfirmationEmail } from '@/lib/email';
 
 export interface User {
   email: string;
@@ -6,6 +7,11 @@ export interface User {
   university?: string;
   major?: string;
   year?: string;
+  phone?: string;
+  dietaryRestrictions?: string;
+  shirtSize?: string;
+  github?: string;
+  linkedin?: string;
   hasCompletedOnboarding: boolean;
   isAdmin?: boolean;
 }
@@ -75,6 +81,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       university: userData.university,
       major: userData.major,
       year: userData.year,
+      phone: userData.phone,
+      dietaryRestrictions: userData.dietaryRestrictions,
+      shirtSize: userData.shirtSize,
+      github: userData.github,
+      linkedin: userData.linkedin,
       hasCompletedOnboarding: userData.hasCompletedOnboarding || false,
       isAdmin: false,
     };
@@ -103,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setUser(newUser);
     localStorage.setItem('user', JSON.stringify(newUser));
+    sendConfirmationEmail(email);
   };
 
   const logout = () => {

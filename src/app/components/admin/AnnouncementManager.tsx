@@ -5,13 +5,17 @@ import {
   addAnnouncement,
   deleteAnnouncement,
   formatAnnouncementTime,
+  getRegisteredUsersForAdmin,
   type StoredAnnouncement,
 } from "@/lib/hackathonStorage";
+import { sendAnnouncementEmail } from "@/lib/email";
 
 export function AnnouncementManager() {
   const [items, setItems] = useState<StoredAnnouncement[]>(() => getAnnouncements());
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
+  const [emailStatus, setEmailStatus] = useState("");
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   const refresh = () => setItems(getAnnouncements());
 
@@ -25,13 +29,34 @@ export function AnnouncementManager() {
     };
   }, []);
 
-  const handleCreate = (e: React.FormEvent) => {
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !message.trim()) return;
-    addAnnouncement(title, message);
+    const nextTitle = title.trim();
+    const nextMessage = message.trim();
+
+    addAnnouncement(nextTitle, nextMessage);
     setTitle("");
     setMessage("");
     refresh();
+
+    const recipients = getRegisteredUsersForAdmin().map((user) => user.email).filter(Boolean);
+    if (recipients.length === 0) {
+      setEmailStatus("Announcement published. No registered emails to notify yet.");
+      return;
+    }
+
+    setSendingEmail(true);
+    const result = await sendAnnouncementEmail(nextTitle, nextMessage, recipients);
+    setSendingEmail(false);
+
+    if (result?.skipped) {
+      setEmailStatus(`Announcement published. Email skipped until RESEND_API_KEY is configured (${recipients.length} recipients).`);
+    } else if (result?.ok) {
+      setEmailStatus(`Announcement published and sent to ${result.sent ?? recipients.length} attendees.`);
+    } else {
+      setEmailStatus("Announcement published, but email sending failed.");
+    }
   };
 
   const handleDelete = (id: string) => {
@@ -77,10 +102,12 @@ export function AnnouncementManager() {
         </div>
         <button
           type="submit"
+          disabled={sendingEmail}
           className="bg-[#6b0000] hover:bg-[#8b0000] text-white px-5 py-2 rounded-lg transition-colors shadow-[0_0_20px_rgba(107,0,0,0.4)]"
         >
-          Publish
+          {sendingEmail ? "Publishing..." : "Publish"}
         </button>
+        {emailStatus && <p className="text-white/70 text-sm">{emailStatus}</p>}
       </form>
 
       <div className="space-y-3">

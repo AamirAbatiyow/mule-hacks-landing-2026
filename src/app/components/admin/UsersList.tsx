@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { getRegisteredUsersForAdmin, type PublicUserRow } from "@/lib/hackathonStorage";
 
+function toProfileUrl(value: string | undefined, baseUrl: string) {
+  const trimmed = value?.trim();
+  if (!trimmed) return "";
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^(www\.|github\.com|linkedin\.com)/i.test(trimmed)) return `https://${trimmed}`;
+  return `${baseUrl}${trimmed}`;
+}
+
 export function UsersList() {
   const [users, setUsers] = useState<PublicUserRow[]>([]);
 
@@ -30,25 +38,66 @@ export function UsersList() {
               <th className="p-3 font-medium">Email</th>
               <th className="p-3 font-medium">Name</th>
               <th className="p-3 font-medium">University</th>
+              <th className="p-3 font-medium">T-shirt</th>
+              <th className="p-3 font-medium">Dietary</th>
+              <th className="p-3 font-medium">Phone</th>
+              <th className="p-3 font-medium">GitHub</th>
+              <th className="p-3 font-medium">LinkedIn</th>
               <th className="p-3 font-medium">Onboarding</th>
             </tr>
           </thead>
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan={4} className="p-6 text-white/50 text-center">
+                <td colSpan={9} className="p-6 text-white/50 text-center">
                   No registered users yet.
                 </td>
               </tr>
             ) : (
-              users.map((u) => (
-                <tr key={u.email} className="border-b border-white/5 text-white/90">
-                  <td className="p-3">{u.email}</td>
-                  <td className="p-3">{u.name || "—"}</td>
-                  <td className="p-3">{u.university || "—"}</td>
-                  <td className="p-3">{u.hasCompletedOnboarding ? "Done" : "Pending"}</td>
-                </tr>
-              ))
+              users.map((u) => {
+                const githubUrl = toProfileUrl(u.github, "https://github.com/");
+                const linkedinUrl = toProfileUrl(u.linkedin, "https://linkedin.com/in/");
+
+                return (
+                  <tr key={u.email} className="border-b border-white/5 text-white/90">
+                    <td className="p-3">{u.email}</td>
+                    <td className="p-3">{u.name || "—"}</td>
+                    <td className="p-3">{u.university || "—"}</td>
+                    <td className="p-3">{u.shirtSize || "—"}</td>
+                    <td className="p-3">{u.dietaryRestrictions || "—"}</td>
+                    <td className="p-3">{u.phone || "—"}</td>
+                    <td className="p-3">
+                      {githubUrl ? (
+                        <a
+                          href={githubUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-white underline decoration-white/40 underline-offset-4 hover:decoration-white"
+                        >
+                          GitHub
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td className="p-3">
+                      {linkedinUrl ? (
+                        <a
+                          href={linkedinUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-white underline decoration-white/40 underline-offset-4 hover:decoration-white"
+                        >
+                          LinkedIn
+                        </a>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td className="p-3">{u.hasCompletedOnboarding ? "Done" : "Pending"}</td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

@@ -188,6 +188,11 @@ export type PublicUserRow = {
   university?: string;
   major?: string;
   year?: string;
+  phone?: string;
+  dietaryRestrictions?: string;
+  shirtSize?: string;
+  github?: string;
+  linkedin?: string;
   hasCompletedOnboarding: boolean;
 };
 
@@ -195,7 +200,19 @@ export function getRegisteredUsersForAdmin(): PublicUserRow[] {
   ensureInitialized();
   const raw = readJson<Record<string, Record<string, unknown>>>("users", {});
   return Object.values(raw).map((row) => {
-    const { email, name, university, major, year, hasCompletedOnboarding } = row as PublicUserRow & {
+    const {
+      email,
+      name,
+      university,
+      major,
+      year,
+      phone,
+      dietaryRestrictions,
+      shirtSize,
+      github,
+      linkedin,
+      hasCompletedOnboarding,
+    } = row as PublicUserRow & {
       password?: string;
     };
     return {
@@ -204,6 +221,11 @@ export function getRegisteredUsersForAdmin(): PublicUserRow[] {
       university,
       major,
       year,
+      phone,
+      dietaryRestrictions,
+      shirtSize,
+      github,
+      linkedin,
       hasCompletedOnboarding: Boolean(hasCompletedOnboarding),
     };
   });

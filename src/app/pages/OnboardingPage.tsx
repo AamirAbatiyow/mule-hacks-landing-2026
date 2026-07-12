@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
-import { User, GraduationCap, BookOpen, Calendar, ChevronRight } from 'lucide-react';
+import { User, GraduationCap, BookOpen, Phone, Github, Linkedin, ChevronRight } from 'lucide-react';
+
+const TOTAL_STEPS = 5;
 
 export function OnboardingPage() {
   const [step, setStep] = useState(1);
@@ -11,6 +13,11 @@ export function OnboardingPage() {
     university: 'University of Central Missouri',
     major: '',
     year: '',
+    phone: '',
+    dietaryRestrictions: '',
+    shirtSize: '',
+    github: '',
+    linkedin: '',
   });
   const { updateUserProfile } = useAuth();
   const navigate = useNavigate();
@@ -20,7 +27,7 @@ export function OnboardingPage() {
   };
 
   const handleNext = () => {
-    if (step < 3) {
+    if (step < TOTAL_STEPS) {
       setStep(step + 1);
     } else {
       updateUserProfile({
@@ -39,6 +46,14 @@ export function OnboardingPage() {
         return formData.university.trim() !== '';
       case 3:
         return formData.major.trim() !== '' && formData.year !== '';
+      case 4:
+        return (
+          formData.phone.trim() !== '' &&
+          formData.dietaryRestrictions.trim() !== '' &&
+          formData.shirtSize !== ''
+        );
+      case 5:
+        return true;
       default:
         return false;
     }
@@ -55,13 +70,13 @@ export function OnboardingPage() {
           {/* Progress Bar */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-white/80">Step {step} of 3</span>
-              <span className="text-sm text-white/80">{Math.round((step / 3) * 100)}%</span>
+              <span className="text-sm text-white/80">Step {step} of {TOTAL_STEPS}</span>
+              <span className="text-sm text-white/80">{Math.round((step / TOTAL_STEPS) * 100)}%</span>
             </div>
             <div className="h-2 bg-black/30 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: `${(step / 3) * 100}%` }}
+                animate={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
                 transition={{ duration: 0.3 }}
                 className="h-full bg-black"
               />
@@ -162,6 +177,101 @@ export function OnboardingPage() {
                 </div>
               </div>
             )}
+
+            {step === 4 && (
+              <div>
+                <div className="w-16 h-16 rounded-full bg-black flex items-center justify-center mx-auto mb-6">
+                  <Phone className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-3xl text-white text-center mb-3">A few event details</h2>
+                <p className="text-white/80 text-center mb-8">
+                  This helps organizers plan food, shirts, and check-in
+                </p>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-white/90 mb-2">Phone Number</label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => handleChange('phone', e.target.value)}
+                      placeholder="(555) 123-4567"
+                      className="w-full bg-black/30 border border-white/20 rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:border-white transition-colors"
+                      autoFocus
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/90 mb-2">Dietary Restrictions</label>
+                    <input
+                      type="text"
+                      value={formData.dietaryRestrictions}
+                      onChange={(e) => handleChange('dietaryRestrictions', e.target.value)}
+                      placeholder="e.g. None, Vegetarian, Nut allergy"
+                      className="w-full bg-black/30 border border-white/20 rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:border-white transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/90 mb-2">T-shirt Size</label>
+                    <select
+                      value={formData.shirtSize}
+                      onChange={(e) => handleChange('shirtSize', e.target.value)}
+                      className="w-full bg-black/30 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white transition-colors"
+                    >
+                      <option value="" className="bg-gray-900">Select your size</option>
+                      <option value="XS" className="bg-gray-900">XS</option>
+                      <option value="S" className="bg-gray-900">S</option>
+                      <option value="M" className="bg-gray-900">M</option>
+                      <option value="L" className="bg-gray-900">L</option>
+                      <option value="XL" className="bg-gray-900">XL</option>
+                      <option value="XXL" className="bg-gray-900">XXL</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {step === 5 && (
+              <div>
+                <div className="w-16 h-16 rounded-full bg-black flex items-center justify-center mx-auto mb-6">
+                  <div className="flex gap-1">
+                    <Github className="w-7 h-7 text-white" />
+                    <Linkedin className="w-7 h-7 text-white" />
+                  </div>
+                </div>
+                <h2 className="text-3xl text-white text-center mb-3">Add your socials</h2>
+                <p className="text-white/80 text-center mb-8">
+                  Optional, but helpful for teammates and organizers
+                </p>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-white/90 mb-2">GitHub (optional)</label>
+                    <input
+                      type="text"
+                      value={formData.github}
+                      onChange={(e) => handleChange('github', e.target.value)}
+                      placeholder="https://github.com/username"
+                      className="w-full bg-black/30 border border-white/20 rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:border-white transition-colors"
+                      autoFocus
+                    />
+                    <p className="text-white/60 text-xs mt-2">
+                      URL preferred (e.g. https://github.com/you), but a username works too.
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-white/90 mb-2">LinkedIn (optional)</label>
+                    <input
+                      type="text"
+                      value={formData.linkedin}
+                      onChange={(e) => handleChange('linkedin', e.target.value)}
+                      placeholder="https://linkedin.com/in/username"
+                      className="w-full bg-black/30 border border-white/20 rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:border-white transition-colors"
+                    />
+                    <p className="text-white/60 text-xs mt-2">
+                      URL preferred (e.g. https://linkedin.com/in/you), but a username works too.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </motion.div>
 
           {/* Navigation Buttons */}
@@ -183,7 +293,7 @@ export function OnboardingPage() {
               disabled={!canProceed()}
               className="flex-1 bg-[#6b0000] hover:bg-[#8b0000] text-white py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(107,0,0,0.5),0_0_40px_rgba(107,0,0,0.3),0_0_60px_rgba(107,0,0,0.2)] hover:shadow-[0_0_30px_rgba(139,0,0,0.6),0_0_60px_rgba(139,0,0,0.4),0_0_80px_rgba(139,0,0,0.3)] flex items-center justify-center gap-2"
             >
-              {step === 3 ? 'Complete' : 'Next'}
+              {step === TOTAL_STEPS ? 'Complete' : 'Next'}
               <ChevronRight className="w-5 h-5" />
             </motion.button>
           </div>
