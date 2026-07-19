@@ -1,7 +1,14 @@
+import "dotenv/config";
 import express from "express";
+import fs from "fs";
 import path from "path";
 import { Resend } from "resend";
 import { fileURLToPath } from "url";
+import { connectDb, ensureAdminUser } from "./server/db.js";
+import authRoutes from "./server/routes/auth.js";
+import usersRoutes from "./server/routes/users.js";
+import announcementsRoutes from "./server/routes/announcements.js";
+import teamsRoutes from "./server/routes/teams.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distPath = path.join(__dirname, "dist");
@@ -27,6 +34,34 @@ function uniqueEmails(emails = []) {
   return [...new Set(emails.map((email) => String(email).trim()).filter(Boolean))];
 }
 
+async function sendConfirmationEmail(email, name = "") {
+  if (!resend) {
+    console.warn("RESEND_API_KEY is not set. Skipping registration confirmation email.");
+    return { ok: true, skipped: true };
+  }
+
+  await resend.emails.send({
+    from: emailFrom,
+    to: email,
+    subject: "Registration confirmed for Mule Hacks 2026",
+    html: `
+      <h1>You're registered for Mule Hacks 2026!</h1>
+      <p>Hi ${escapeHtml(name || "there")},</p>
+      <p>Your registration is confirmed. Complete onboarding in your dashboard so organizers have your event details.</p>
+      <p>We will send important announcements to this email as the event gets closer.</p>
+    `,
+    text: `You're registered for Mule Hacks 2026!\n\nHi ${name || "there"},\n\nYour registration is confirmed. Complete onboarding in your dashboard so organizers have your event details.\n\nWe will send important announcements to this email as the event gets closer.`,
+  });
+
+  return { ok: true, sent: 1 };
+}
+
+app.locals.sendConfirmationEmail = (email, name) => {
+  void sendConfirmationEmail(email, name).catch((error) => {
+    console.error("Failed to send registration confirmation email:", error);
+  });
+};
+
 app.post("/api/send-confirmation", async (req, res) => {
   const email = String(req.body?.email || "").trim();
   const name = String(req.body?.name || "").trim();
@@ -35,26 +70,9 @@ app.post("/api/send-confirmation", async (req, res) => {
     return res.status(400).json({ ok: false, error: "Email is required." });
   }
 
-  if (!resend) {
-    console.warn("RESEND_API_KEY is not set. Skipping registration confirmation email.");
-    return res.json({ ok: true, skipped: true });
-  }
-
   try {
-    await resend.emails.send({
-      from: emailFrom,
-      to: email,
-      subject: "Registration confirmed for Mule Hacks 2026",
-      html: `
-        <h1>You're registered for Mule Hacks 2026!</h1>
-        <p>Hi ${escapeHtml(name || "there")},</p>
-        <p>Your registration is confirmed. Complete onboarding in your dashboard so organizers have your event details.</p>
-        <p>We will send important announcements to this email as the event gets closer.</p>
-      `,
-      text: `You're registered for Mule Hacks 2026!\n\nHi ${name || "there"},\n\nYour registration is confirmed. Complete onboarding in your dashboard so organizers have your event details.\n\nWe will send important announcements to this email as the event gets closer.`,
-    });
-
-    return res.json({ ok: true, sent: 1 });
+    const result = await sendConfirmationEmail(email, name);
+    return res.json(result);
   } catch (error) {
     console.error("Failed to send registration confirmation email:", error);
     return res.status(500).json({ ok: false, error: "Failed to send email." });
@@ -106,12 +124,39 @@ app.post("/api/send-announcement", async (req, res) => {
   }
 });
 
-app.use(express.static(distPath, { index: false }));
+app.use("/api/auth", authRoutes);
+app.use("/api/users", usersRoutes);
+app.use("/api/announcements", announcementsRoutes);
+app.use("/api/teams", teamsRoutes);
 
-app.use((req, res) => {
-  res.sendFile(path.join(distPath, "index.html"));
-});
+const distExists = fs.existsSync(distPath);
+if (distExists) {
+  app.use(express.static(distPath, { index: false }));
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api")) {
+      return next();
+    }
+    return res.sendFile(path.join(distPath, "index.html"));
+  });
+} else {
+  console.warn(`dist/ not found at ${distPath}. Serving API only (run Vite for the frontend).`);
+}
 
-app.listen(port, () => {
-  console.log(`Server listening on http://localhost:${port}`);
+async function start() {
+  if (!process.env.JWT_SECRET) {
+    console.error("JWT_SECRET is required.");
+    process.exit(1);
+  }
+
+  await connectDb(process.env.MONGODB_URI);
+  await ensureAdminUser();
+
+  app.listen(port, () => {
+    console.log(`Server listening on http://localhost:${port}`);
+  });
+}
+
+start().catch((error) => {
+  console.error("Failed to start server:", error);
+  process.exit(1);
 });

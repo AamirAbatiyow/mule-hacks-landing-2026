@@ -1,0 +1,47 @@
+import mongoose from "mongoose";
+
+const userSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    passwordHash: { type: String, required: true },
+    name: { type: String, trim: true },
+    university: { type: String, trim: true },
+    major: { type: String, trim: true },
+    year: { type: String, trim: true },
+    phone: { type: String, trim: true },
+    dietaryRestrictions: { type: String, trim: true },
+    shirtSize: { type: String, trim: true },
+    github: { type: String, trim: true },
+    linkedin: { type: String, trim: true },
+    hasCompletedOnboarding: { type: Boolean, default: false },
+    isAdmin: { type: Boolean, default: false },
+  },
+  { timestamps: true }
+);
+
+export function toPublicUser(doc) {
+  if (!doc) return null;
+  const user = typeof doc.toObject === "function" ? doc.toObject() : doc;
+  return {
+    email: user.email,
+    name: user.name,
+    university: user.university,
+    major: user.major,
+    year: user.year,
+    phone: user.phone,
+    dietaryRestrictions: user.dietaryRestrictions,
+    shirtSize: user.shirtSize,
+    github: user.github,
+    linkedin: user.linkedin,
+    hasCompletedOnboarding: Boolean(user.hasCompletedOnboarding),
+    isAdmin: Boolean(user.isAdmin),
+  };
+}
+
+export const User = mongoose.models.User || mongoose.model("User", userSchema);

@@ -26,15 +26,20 @@ export function OnboardingPage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step < TOTAL_STEPS) {
       setStep(step + 1);
-    } else {
-      updateUserProfile({
+      return;
+    }
+
+    try {
+      await updateUserProfile({
         ...formData,
         hasCompletedOnboarding: true,
       });
       navigate('/dashboard');
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to save profile');
     }
   };
 

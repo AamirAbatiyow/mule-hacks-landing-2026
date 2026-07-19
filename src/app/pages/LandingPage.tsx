@@ -86,19 +86,11 @@ export function LandingPage() {
                 >
                   FAQ
                 </a>
-                {/* Registration currently disabled - original link preserved for future use
                 <Link to="/auth?mode=register" onClick={() => setMobileMenuOpen(false)}>
                   <button className="w-full bg-[#6b0000] hover:bg-[#8b0000] text-white px-6 py-3 rounded-lg transition-all mt-2">
                     Register Now
                   </button>
                 </Link>
-                */}
-                <button
-                  disabled
-                  className="w-full bg-[#6b0000] hover:bg-[#8b0000] text-white px-6 py-3 rounded-lg transition-all mt-2"
-                >
-                  Registration will open soon
-                </button>
               </div>
             </motion.div>
           )}
@@ -357,7 +349,6 @@ export function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              {/* Registration currently disabled - original link preserved for future use
               <Link to="/auth?mode=register">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -368,13 +359,6 @@ export function LandingPage() {
                   <ChevronRight className="w-5 h-5" />
                 </motion.button>
               </Link>
-              */}
-              <button
-                disabled
-                className="bg-[#6b0000] hover:bg-[#8b0000] text-white px-8 py-4 rounded-lg flex items-center gap-2 shadow-[0_0_20px_rgba(107,0,0,0.5),0_0_40px_rgba(107,0,0,0.3),0_0_60px_rgba(107,0,0,0.2)] hover:shadow-[0_0_30px_rgba(139,0,0,0.6),0_0_60px_rgba(139,0,0,0.4),0_0_80px_rgba(139,0,0,0.3)] transition-all"
-              >
-                Registration will open soon
-              </button>
 
               <div className="flex items-center gap-4 text-white/90">
                 <div className="flex items-center gap-2">
@@ -390,10 +374,10 @@ export function LandingPage() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
               {[
-                { icon: Users, label: "TBD", color: "from-red-500 to-orange-500" }, // "500+ Hackers"
-                { icon: Trophy, label: "TBD", color: "from-orange-500 to-yellow-500" }, // "$10K Prizes"
-                { icon: Clock, label: "24 Hours", color: "from-yellow-500 to-red-500" }, // "24 Hours"
-                { icon: Zap, label: "TBD", color: "from-red-500 to-pink-500" }, // "30+ Mentors"
+                { icon: Users, label: "150+ Hackers", color: "from-red-500 to-orange-500" },
+                { icon: Trophy, label: "$1K+ Prizes", color: "from-orange-500 to-yellow-500" },
+                { icon: Clock, label: "24 Hours", color: "from-yellow-500 to-red-500" },
+                { icon: Zap, label: "10+ Mentors", color: "from-red-500 to-pink-500" },
               ].map((stat, i) => (
                 <motion.div
                   key={i}
@@ -740,8 +724,7 @@ export function LandingPage() {
           <p className="text-xl text-white/90 mb-8">
             Register now and be part of the most exciting hackathon in Missouri!
           </p>
-          {/* Registration currently disabled - original link preserved for future use
-          <Link to="/auth">
+          <Link to="/auth?mode=register">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -751,13 +734,6 @@ export function LandingPage() {
               <ChevronRight className="w-5 h-5" />
             </motion.button>
           </Link>
-          */}
-          <button
-            disabled
-            className="bg-[#6b0000] hover:bg-[#8b0000] text-white px-10 py-4 rounded-lg inline-flex items-center gap-2 shadow-[0_0_20px_rgba(107,0,0,0.5),0_0_40px_rgba(107,0,0,0.3),0_0_60px_rgba(107,0,0,0.2)] hover:shadow-[0_0_30px_rgba(139,0,0,0.6),0_0_60px_rgba(139,0,0,0.4),0_0_80px_rgba(139,0,0,0.3)] transition-all"
-          >
-            Registration will open soon
-          </button>
         </motion.div>
       </section>
 

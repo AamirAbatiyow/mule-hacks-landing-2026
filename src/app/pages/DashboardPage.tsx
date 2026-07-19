@@ -29,8 +29,14 @@ import QRCode from 'react-qr-code';
 import {
   getAnnouncements,
   formatAnnouncementTime,
+  getTeams,
+  createTeam,
+  joinTeam,
+  leaveTeam,
   type StoredAnnouncement,
+  type StoredTeam,
 } from '@/lib/hackathonStorage';
+import type { User } from '../context/AuthContext';
 import { day1, day2 } from '@/data/schedule';
 
 export function DashboardPage() {
@@ -242,16 +248,23 @@ function CheckInView({ user }: { user: any }) {
 }
 
 function AnnouncementsView() {
-  const [announcements, setAnnouncements] = useState<StoredAnnouncement[]>(() => getAnnouncements());
+  const [announcements, setAnnouncements] = useState<StoredAnnouncement[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const sync = () => setAnnouncements(getAnnouncements());
-    sync();
-    window.addEventListener('mulehacks-storage', sync);
-    window.addEventListener('storage', sync);
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await getAnnouncements();
+        if (!cancelled) setAnnouncements(list);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
     return () => {
-      window.removeEventListener('mulehacks-storage', sync);
-      window.removeEventListener('storage', sync);
+      cancelled = true;
     };
   }, []);
 
@@ -271,6 +284,11 @@ function AnnouncementsView() {
         <h1 className="text-3xl sm:text-4xl text-white mb-2">Announcements</h1>
         <p className="text-white/80">Stay updated with the latest news and updates</p>
       </div>
+
+      {loading && <p className="text-white/60">Loading announcements…</p>}
+      {!loading && announcements.length === 0 && (
+        <p className="text-white/60">No announcements yet.</p>
+      )}
 
       <div className="space-y-4">
         {announcements.map((announcement) => (
@@ -362,30 +380,105 @@ function AnnouncementsView() {
   );
 }
 
-function TeamView({ user }: { user: any }) {
-  const [hasTeam, setHasTeam] = useState(false);
+function TeamView({ user }: { user: User | null }) {
+  const [myTeam, setMyTeam] = useState<StoredTeam | null>(null);
+  const [otherTeams, setOtherTeams] = useState<StoredTeam[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [teamCode, setTeamCode] = useState('');
+  const [teamName, setTeamName] = useState('');
+  const [error, setError] = useState('');
 
-  const myTeam = {
-    name: 'Code Crushers',
-    code: 'CC2026',
-    members: [
-      { name: user?.name || 'You', role: 'Team Lead', email: user?.email },
-      { name: 'Alex Johnson', role: 'Developer', email: 'alex@example.com' },
-      { name: 'Sarah Williams', role: 'Designer', email: 'sarah@example.com' },
-    ],
+  const refreshTeams = async () => {
+    const teams = await getTeams();
+    const email = user?.email?.toLowerCase();
+    const mine = email
+      ? teams.find((t) => t.memberEmails.map((e) => e.toLowerCase()).includes(email)) || null
+      : null;
+    setMyTeam(mine);
+    setOtherTeams(teams.filter((t) => t.id !== mine?.id));
   };
 
-  const otherTeams = [
-    { name: 'Hack Heroes', members: 4, project: 'AI-powered task manager' },
-    { name: 'Debug Dragons', members: 3, project: 'Smart home automation' },
-    { name: 'Pixel Pirates', members: 4, project: 'Educational game platform' },
-    { name: 'Code Warriors', members: 2, project: 'Health tracking app' },
-  ];
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        await refreshTeams();
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load teams');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.email]);
 
-  if (!hasTeam) {
+  const handleCreate = async () => {
+    setBusy(true);
+    setError('');
+    try {
+      const team = await createTeam({
+        name: teamName.trim() || `${user?.name || 'My'}'s Team`,
+      });
+      setMyTeam(team);
+      await refreshTeams();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create team');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleJoin = async () => {
+    if (!teamCode.trim()) {
+      setError('Enter a team code');
+      return;
+    }
+    setBusy(true);
+    setError('');
+    try {
+      const team = await joinTeam(teamCode.trim());
+      setMyTeam(team);
+      setShowJoinModal(false);
+      setTeamCode('');
+      await refreshTeams();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to join team');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleLeave = async () => {
+    if (!myTeam || !confirm('Are you sure you want to leave this team?')) return;
+    setBusy(true);
+    setError('');
+    try {
+      await leaveTeam(myTeam.id);
+      setMyTeam(null);
+      await refreshTeams();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to leave team');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-6 max-w-4xl mx-auto">
+        <p className="text-white/60">Loading teams…</p>
+      </div>
+    );
+  }
+
+  if (!myTeam) {
     return (
       <div className="space-y-6 max-w-4xl mx-auto">
         <div>
@@ -400,33 +493,29 @@ function TeamView({ user }: { user: any }) {
             Teams can have up to 4 members. Create a new team or join an existing one to start collaborating!
           </p>
 
+          <div className="max-w-md mx-auto mb-6">
+            <input
+              type="text"
+              value={teamName}
+              onChange={(e) => setTeamName(e.target.value)}
+              placeholder="Team name (optional)"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white placeholder:text-white/50 focus:outline-none focus:border-white transition-colors"
+            />
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => {
-                setShowCreateModal(true);
-                setTimeout(() => {
-                  alert('Team created! (Demo mode)');
-                  setShowCreateModal(false);
-                  setHasTeam(true);
-                }, 1000);
-              }}
-              className="bg-[#000000] hover:bg-[#000000] text-white px-8 py-3 rounded-lg transition-all flex items-center gap-2 justify-center shadow-[0_0_20px_rgba(187,0,0,0.5),0_0_40px_rgba(187,0,0,0.3),0_0_60px_rgba(187,0,0,0.2)] hover:shadow-[0_0_30px_rgba(221,0,0,0.6),0_0_60px_rgba(221,0,0,0.4),0_0_80px_rgba(221,0,0,0.3)]"
+              disabled={busy}
+              onClick={() => void handleCreate()}
+              className="bg-[#000000] hover:bg-[#000000] text-white px-8 py-3 rounded-lg transition-all flex items-center gap-2 justify-center shadow-[0_0_20px_rgba(187,0,0,0.5),0_0_40px_rgba(187,0,0,0.3),0_0_60px_rgba(187,0,0,0.2)] hover:shadow-[0_0_30px_rgba(221,0,0,0.6),0_0_60px_rgba(221,0,0,0.4),0_0_80px_rgba(221,0,0,0.3)] disabled:opacity-50"
             >
               <UserPlus className="w-5 h-5" />
               Create Team
             </button>
             <button
-              onClick={() => {
-                setShowJoinModal(true);
-                setTimeout(() => {
-                  if (teamCode) {
-                    alert('Joined team! (Demo mode)');
-                    setShowJoinModal(false);
-                    setHasTeam(true);
-                  }
-                }, 1000);
-              }}
-              className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-3 rounded-lg transition-all flex items-center gap-2 justify-center"
+              disabled={busy}
+              onClick={() => setShowJoinModal((v) => !v)}
+              className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-3 rounded-lg transition-all flex items-center gap-2 justify-center disabled:opacity-50"
             >
               <Users className="w-5 h-5" />
               Join Team
@@ -434,7 +523,7 @@ function TeamView({ user }: { user: any }) {
           </div>
 
           {showJoinModal && (
-            <div className="mt-6 p-6 bg-white/5 rounded-lg border border-white/10 max-w-md mx-auto">
+            <div className="mt-6 p-6 bg-white/5 rounded-lg border border-white/10 max-w-md mx-auto space-y-3">
               <p className="text-white mb-3">Enter Team Code</p>
               <input
                 type="text"
@@ -443,8 +532,17 @@ function TeamView({ user }: { user: any }) {
                 placeholder="e.g., CC2026"
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white placeholder:text-white/50 focus:outline-none focus:border-white transition-colors"
               />
+              <button
+                disabled={busy}
+                onClick={() => void handleJoin()}
+                className="w-full bg-[#6b0000] hover:bg-[#8b0000] text-white px-4 py-2 rounded-lg disabled:opacity-50"
+              >
+                Join
+              </button>
             </div>
           )}
+
+          {error && <p className="text-red-300 text-sm mt-4">{error}</p>}
         </div>
 
         <div className="bg-[#6b0000]/30 border border-white/20 rounded-xl p-6">
@@ -469,21 +567,20 @@ function TeamView({ user }: { user: any }) {
         <p className="text-white/80">Collaborate and compete together</p>
       </div>
 
+      {error && <p className="text-red-300 text-sm">{error}</p>}
+
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="bg-[#6b0000]/30 border border-white/20 rounded-xl p-6">
           <div className="flex items-start justify-between mb-6">
             <div>
               <h3 className="text-2xl text-white mb-2">{myTeam.name}</h3>
               <p className="text-white">Team Code: {myTeam.code}</p>
+              {myTeam.project && <p className="text-white/80 text-sm mt-1">{myTeam.project}</p>}
             </div>
             <button
-              onClick={() => {
-                if (confirm('Are you sure you want to leave this team?')) {
-                  alert('Left team! (Demo mode)');
-                  setHasTeam(false);
-                }
-              }}
-              className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all flex items-center gap-2"
+              disabled={busy}
+              onClick={() => void handleLeave()}
+              className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all flex items-center gap-2 disabled:opacity-50"
             >
               <UserMinus className="w-4 h-4" />
               Leave Team
@@ -491,17 +588,17 @@ function TeamView({ user }: { user: any }) {
           </div>
 
           <div className="space-y-3">
-            {myTeam.members.map((member, idx) => (
-              <div key={idx} className="bg-white/5 rounded-lg p-4 border border-white/10">
+            {myTeam.memberEmails.map((email) => (
+              <div key={email} className="bg-white/5 rounded-lg p-4 border border-white/10">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-[#000000] flex items-center justify-center">
-                    <span className="text-white">{member.name.charAt(0)}</span>
+                    <span className="text-white">{email.charAt(0).toUpperCase()}</span>
                   </div>
                   <div className="flex-1">
-                    <p className="text-white">{member.name}</p>
-                    <p className="text-sm text-white/80">{member.role}</p>
+                    <p className="text-white">{email === user?.email ? user?.name || email : email}</p>
+                    <p className="text-sm text-white/80">{email}</p>
                   </div>
-                  {idx === 0 && (
+                  {email === user?.email && (
                     <span className="bg-[#000000] text-white text-xs px-2 py-1 rounded">You</span>
                   )}
                 </div>
@@ -509,27 +606,32 @@ function TeamView({ user }: { user: any }) {
             ))}
           </div>
 
-          <button className="w-full mt-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-4 py-3 rounded-lg transition-all flex items-center gap-2 justify-center">
-            <UserPlus className="w-5 h-5" />
-            Invite Team Member
-          </button>
+          <p className="w-full mt-4 text-white/60 text-sm text-center">
+            Share code <span className="font-mono text-white">{myTeam.code}</span> to invite members
+          </p>
         </div>
 
         <div className="bg-[#000000]/30 backdrop-blur-sm border border-white/20 rounded-xl p-6">
           <h3 className="text-xl text-white mb-4">Other Teams</h3>
           <div className="space-y-3">
-            {otherTeams.map((team, idx) => (
-              <div key={idx} className="bg-white/5 rounded-lg p-4 border border-white/10">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-white mb-1">{team.name}</p>
-                    <p className="text-sm text-white/80 mb-2">{team.members} members</p>
-                    <p className="text-sm text-white/90">{team.project}</p>
+            {otherTeams.length === 0 ? (
+              <p className="text-white/60 text-sm">No other teams yet.</p>
+            ) : (
+              otherTeams.map((team) => (
+                <div key={team.id} className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-white mb-1">{team.name}</p>
+                      <p className="text-sm text-white/80 mb-2">
+                        {team.memberEmails.length} members
+                      </p>
+                      <p className="text-sm text-white/90">{team.project || 'No project yet'}</p>
+                    </div>
+                    <Users className="w-5 h-5 text-white/50" />
                   </div>
-                  <Users className="w-5 h-5 text-white/50" />
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>

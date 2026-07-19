@@ -92,8 +92,8 @@ export function AdminDashboard() {
             <div className="max-w-3xl space-y-6">
               <h1 className="text-3xl text-white">Admin dashboard</h1>
               <p className="text-white/70">
-                Use the sidebar to manage announcements, view registered users, and browse teams. Data is stored in{" "}
-                <code className="text-white/90 bg-white/10 px-1 rounded">localStorage</code> for this demo.
+                Use the sidebar to manage announcements, view registered users, and browse teams. Data is stored in
+                MongoDB Atlas.
               </p>
               <div className="grid sm:grid-cols-2 gap-4">
                 <button

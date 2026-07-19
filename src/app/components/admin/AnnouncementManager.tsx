@@ -11,22 +11,26 @@ import {
 import { sendAnnouncementEmail } from "@/lib/email";
 
 export function AnnouncementManager() {
-  const [items, setItems] = useState<StoredAnnouncement[]>(() => getAnnouncements());
+  const [items, setItems] = useState<StoredAnnouncement[]>([]);
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [emailStatus, setEmailStatus] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const refresh = () => setItems(getAnnouncements());
+  const refresh = async () => {
+    try {
+      const list = await getAnnouncements();
+      setItems(list);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const onStorage = () => refresh();
-    window.addEventListener("mulehacks-storage", onStorage);
-    window.addEventListener("storage", onStorage);
-    return () => {
-      window.removeEventListener("mulehacks-storage", onStorage);
-      window.removeEventListener("storage", onStorage);
-    };
+    void refresh();
   }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -35,12 +39,23 @@ export function AnnouncementManager() {
     const nextTitle = title.trim();
     const nextMessage = message.trim();
 
-    addAnnouncement(nextTitle, nextMessage);
-    setTitle("");
-    setMessage("");
-    refresh();
+    try {
+      await addAnnouncement(nextTitle, nextMessage);
+      setTitle("");
+      setMessage("");
+      await refresh();
+    } catch (error) {
+      setEmailStatus(error instanceof Error ? error.message : "Failed to publish announcement.");
+      return;
+    }
 
-    const recipients = getRegisteredUsersForAdmin().map((user) => user.email).filter(Boolean);
+    let recipients: string[] = [];
+    try {
+      recipients = (await getRegisteredUsersForAdmin()).map((user) => user.email).filter(Boolean);
+    } catch {
+      recipients = [];
+    }
+
     if (recipients.length === 0) {
       setEmailStatus("Announcement published. No registered emails to notify yet.");
       return;
@@ -51,18 +66,26 @@ export function AnnouncementManager() {
     setSendingEmail(false);
 
     if (result?.skipped) {
-      setEmailStatus(`Announcement published. Email skipped until RESEND_API_KEY is configured (${recipients.length} recipients).`);
+      setEmailStatus(
+        `Announcement published. Email skipped until RESEND_API_KEY is configured (${recipients.length} recipients).`
+      );
     } else if (result?.ok) {
-      setEmailStatus(`Announcement published and sent to ${result.sent ?? recipients.length} attendees.`);
+      setEmailStatus(
+        `Announcement published and sent to ${result.sent ?? recipients.length} attendees.`
+      );
     } else {
       setEmailStatus("Announcement published, but email sending failed.");
     }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Delete this announcement?")) return;
-    deleteAnnouncement(id);
-    refresh();
+    try {
+      await deleteAnnouncement(id);
+      await refresh();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to delete announcement.");
+    }
   };
 
   return (
@@ -112,7 +135,9 @@ export function AnnouncementManager() {
 
       <div className="space-y-3">
         <h3 className="text-lg text-white">All announcements ({items.length})</h3>
-        {items.length === 0 ? (
+        {loading ? (
+          <p className="text-white/60 text-sm">Loading…</p>
+        ) : items.length === 0 ? (
           <p className="text-white/60 text-sm">No announcements yet.</p>
         ) : (
           <ul className="space-y-3">
@@ -130,7 +155,7 @@ export function AnnouncementManager() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => handleDelete(a.id)}
+                  onClick={() => void handleDelete(a.id)}
                   className="shrink-0 inline-flex items-center gap-2 text-red-300 hover:text-red-200 text-sm border border-red-500/40 rounded-lg px-3 py-2 hover:bg-red-950/40"
                 >
                   <Trash2 className="w-4 h-4" /> Delete
