@@ -3,7 +3,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Calendar, Trophy, Users, ChevronRight, Sparkles, Code2, Zap, Award, Clock, MapPin, ChevronDown, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import organizers from '@/data/organizers.json';
-import { day1, day2 } from '@/data/schedule';
+import {
+  scheduleStart,
+  scheduleEnd,
+  SCHEDULE_REVEAL_MESSAGE,
+} from '@/data/schedule';
 
 export function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -444,43 +448,43 @@ export function LandingPage() {
             className="text-center mb-12"
           >
             <h2 className="text-4xl mb-4 text-white">Event Schedule</h2>
-            <p className="text-white/80">Plan your hackathon weekend</p>
+            <p className="text-white/80">{SCHEDULE_REVEAL_MESSAGE}</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Day 1 */}
+          <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               className="bg-black/30 border border-white/20 rounded-xl p-6"
             >
-              <h3 className="text-2xl mb-6 text-white">Day 1 - October 3</h3>
-              <div className="space-y-4">
-                {day1.map((item, i) => (
-                  <div key={i} className="flex items-start gap-4 text-white/90">
-                    <span className="text-white font-mono min-w-32 whitespace-nowrap">{item.time}</span>
-                    <span>{item.event}</span>
-                  </div>
-                ))}
+              <p className="text-white/60 text-sm uppercase tracking-wider mb-2">Arrive</p>
+              <h3 className="text-2xl mb-4 text-white">
+                {scheduleStart.day} — {scheduleStart.date}
+              </h3>
+              <div className="flex items-start gap-4 text-white/90">
+                <span className="text-white font-mono min-w-24 whitespace-nowrap">
+                  {scheduleStart.time}
+                </span>
+                <span>{scheduleStart.event}</span>
               </div>
             </motion.div>
 
-            {/* Day 2 */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               className="bg-black/30 border border-white/20 rounded-xl p-6"
             >
-              <h3 className="text-2xl mb-6 text-white">Day 2 - October 4</h3>
-              <div className="space-y-4">
-                {day2.map((item, i) => (
-                  <div key={i} className="flex items-start gap-4 text-white/90">
-                    <span className="text-white font-mono min-w-32 whitespace-nowrap">{item.time}</span>
-                    <span>{item.event}</span>
-                  </div>
-                ))}
+              <p className="text-white/60 text-sm uppercase tracking-wider mb-2">Ends</p>
+              <h3 className="text-2xl mb-4 text-white">
+                {scheduleEnd.day} — {scheduleEnd.date}
+              </h3>
+              <div className="flex items-start gap-4 text-white/90">
+                <span className="text-white font-mono min-w-24 whitespace-nowrap">
+                  {scheduleEnd.time}
+                </span>
+                <span>{scheduleEnd.event}</span>
               </div>
             </motion.div>
           </div>

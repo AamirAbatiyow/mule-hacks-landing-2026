@@ -37,7 +37,11 @@ import {
   type StoredTeam,
 } from '@/lib/hackathonStorage';
 import type { User } from '../context/AuthContext';
-import { day1, day2 } from '@/data/schedule';
+import {
+  scheduleStart,
+  scheduleEnd,
+  SCHEDULE_REVEAL_MESSAGE,
+} from '@/data/schedule';
 
 export function DashboardPage() {
   const [currentView, setCurrentView] = useState('checkin');
@@ -689,28 +693,27 @@ function ResourcesView() {
       color: 'from-green-500 to-green-600',
       content: (
         <div className="space-y-6">
-          <h2 className="text-3xl text-white mb-4">Event Schedule</h2>
+          <h2 className="text-3xl text-white mb-2">Event Schedule</h2>
+          <p className="text-white/70">{SCHEDULE_REVEAL_MESSAGE}</p>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-              <h3 className="text-xl text-white mb-4">Day 1 - October 3</h3>
-              <div className="space-y-2">
-                {day1.map((item, i) => (
-                  <div key={i} className="flex justify-between text-sm py-2 border-b border-white/5">
-                    <span className="text-gray-400 whitespace-nowrap">{item.time}</span>
-                    <span className="text-white">{item.event}</span>
-                  </div>
-                ))}
+              <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Arrive</p>
+              <h3 className="text-xl text-white mb-4">
+                {scheduleStart.day} — {scheduleStart.date}
+              </h3>
+              <div className="flex justify-between text-sm py-2">
+                <span className="text-gray-400 whitespace-nowrap">{scheduleStart.time}</span>
+                <span className="text-white">{scheduleStart.event}</span>
               </div>
             </div>
             <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-              <h3 className="text-xl text-white mb-4">Day 2 - October 4</h3>
-              <div className="space-y-2">
-                {day2.map((item, i) => (
-                  <div key={i} className="flex justify-between text-sm py-2 border-b border-white/5">
-                    <span className="text-gray-400 whitespace-nowrap">{item.time}</span>
-                    <span className="text-white">{item.event}</span>
-                  </div>
-                ))}
+              <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Ends</p>
+              <h3 className="text-xl text-white mb-4">
+                {scheduleEnd.day} — {scheduleEnd.date}
+              </h3>
+              <div className="flex justify-between text-sm py-2">
+                <span className="text-gray-400 whitespace-nowrap">{scheduleEnd.time}</span>
+                <span className="text-white">{scheduleEnd.event}</span>
               </div>
             </div>
           </div>

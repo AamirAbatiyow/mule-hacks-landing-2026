@@ -3,6 +3,32 @@ export interface ScheduleItem {
   event: string;
 }
 
+export interface ScheduleBound {
+  day: string;
+  date: string;
+  time: string;
+  event: string;
+}
+
+/** Arrival / departure anchors for planning. Full agenda revealed closer to the event. */
+export const scheduleStart: ScheduleBound = {
+  day: 'Day 1',
+  date: 'October 3',
+  time: '1:30 PM',
+  event: 'Check-In Opens',
+};
+
+export const scheduleEnd: ScheduleBound = {
+  day: 'Day 2',
+  date: 'October 4',
+  time: '4:00 PM',
+  event: 'Awards Ceremony',
+};
+
+export const SCHEDULE_REVEAL_MESSAGE =
+  'The full schedule will be revealed closer to the event.';
+
+// Full agenda kept for when registration opens the detailed schedule.
 export const day1: ScheduleItem[] = [
   { time: '1:30 PM', event: 'Check-In Opens' },
   { time: '2:00 PM', event: 'Opening Ceremony' },
