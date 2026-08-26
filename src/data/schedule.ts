@@ -28,6 +28,9 @@ export const scheduleEnd: ScheduleBound = {
 export const SCHEDULE_REVEAL_MESSAGE =
   'The full schedule will be revealed closer to the event.';
 
+export const SCHEDULE_EVENTS_BLURB =
+  'Expect fun and educational events throughout the weekend — workshops, ping pong, Mario Kart, and more.';
+
 // Full agenda kept for when registration opens the detailed schedule.
 export const day1: ScheduleItem[] = [
   { time: '1:30 PM', event: 'Check-In Opens' },

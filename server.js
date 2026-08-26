@@ -62,6 +62,35 @@ app.locals.sendConfirmationEmail = (email, name) => {
   });
 };
 
+async function sendPasswordResetEmail(email, resetUrl) {
+  if (!resend) {
+    console.warn("RESEND_API_KEY is not set. Skipping password reset email.");
+    return { ok: true, skipped: true };
+  }
+
+  await resend.emails.send({
+    from: emailFrom,
+    to: email,
+    subject: "Reset your Mule Hacks password",
+    html: `
+      <h1>Reset your password</h1>
+      <p>We received a request to reset the password for this Mule Hacks account.</p>
+      <p><a href="${escapeHtml(resetUrl)}">Set a new password</a></p>
+      <p>This link expires in 1 hour. If you did not request a reset, you can ignore this email.</p>
+    `,
+    text: `Reset your Mule Hacks password\n\nOpen this link to set a new password:\n${resetUrl}\n\nThis link expires in 1 hour. If you did not request a reset, you can ignore this email.`,
+  });
+
+  return { ok: true, sent: 1 };
+}
+
+app.locals.sendPasswordResetEmail = (email, resetUrl) => {
+  return sendPasswordResetEmail(email, resetUrl).catch((error) => {
+    console.error("Failed to send password reset email:", error);
+    throw error;
+  });
+};
+
 app.post("/api/send-confirmation", async (req, res) => {
   const email = String(req.body?.email || "").trim();
   const name = String(req.body?.name || "").trim();

@@ -1,7 +1,24 @@
 import { Router } from "express";
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { User, toPublicUser } from "../models/User.js";
 import { requireAuth, signToken } from "../middleware/auth.js";
+
+function hashResetToken(token) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+function getAppUrl(req) {
+  const configured = String(process.env.APP_URL || "").trim();
+  if (configured) return configured.replace(/\/$/, "");
+
+  const origin = String(req.get("origin") || "").trim();
+  if (origin) return origin.replace(/\/$/, "");
+
+  const proto = req.get("x-forwarded-proto") || req.protocol;
+  const host = req.get("x-forwarded-host") || req.get("host");
+  return `${proto}://${host}`;
+}
 
 const router = Router();
 
@@ -86,6 +103,74 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error("Login failed:", error);
     return res.status(500).json({ ok: false, error: "Login failed." });
+  }
+});
+
+router.post("/forgot-password", async (req, res) => {
+  const genericMessage =
+    "If an account exists for that email, we sent a password reset link.";
+
+  try {
+    const email = String(req.body?.email || "")
+      .trim()
+      .toLowerCase();
+
+    if (!email) {
+      return res.status(400).json({ ok: false, error: "Email is required." });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.json({ ok: true, message: genericMessage });
+    }
+
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    user.passwordResetTokenHash = hashResetToken(rawToken);
+    user.passwordResetExpiresAt = new Date(Date.now() + 60 * 60 * 1000);
+    await user.save();
+
+    const resetUrl = `${getAppUrl(req)}/reset-password?token=${rawToken}`;
+    if (typeof req.app.locals.sendPasswordResetEmail === "function") {
+      await req.app.locals.sendPasswordResetEmail(email, resetUrl);
+    }
+
+    return res.json({ ok: true, message: genericMessage });
+  } catch (error) {
+    console.error("Forgot password failed:", error);
+    return res.status(500).json({ ok: false, error: "Failed to send reset email." });
+  }
+});
+
+router.post("/reset-password", async (req, res) => {
+  try {
+    const token = String(req.body?.token || "").trim();
+    const password = String(req.body?.password || "");
+
+    if (!token || !password) {
+      return res.status(400).json({ ok: false, error: "Token and password are required." });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ ok: false, error: "Password must be at least 6 characters." });
+    }
+
+    const user = await User.findOne({
+      passwordResetTokenHash: hashResetToken(token),
+      passwordResetExpiresAt: { $gt: new Date() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ ok: false, error: "This reset link is invalid or has expired." });
+    }
+
+    user.passwordHash = await bcrypt.hash(password, 12);
+    user.passwordResetTokenHash = null;
+    user.passwordResetExpiresAt = null;
+    await user.save();
+
+    return res.json({ ok: true, message: "Password updated. You can sign in now." });
+  } catch (error) {
+    console.error("Reset password failed:", error);
+    return res.status(500).json({ ok: false, error: "Failed to reset password." });
   }
 });
 

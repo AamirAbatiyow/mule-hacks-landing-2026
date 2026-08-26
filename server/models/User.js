@@ -21,6 +21,8 @@ const userSchema = new mongoose.Schema(
     linkedin: { type: String, trim: true },
     hasCompletedOnboarding: { type: Boolean, default: false },
     isAdmin: { type: Boolean, default: false },
+    passwordResetTokenHash: { type: String, default: null },
+    passwordResetExpiresAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

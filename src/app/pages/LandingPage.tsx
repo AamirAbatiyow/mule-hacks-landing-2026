@@ -3,10 +3,13 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Calendar, Trophy, Users, ChevronRight, Sparkles, Code2, Zap, Award, Clock, MapPin, ChevronDown, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import organizers from '@/data/organizers.json';
+import { SpinningCarousel } from '../components/SpinningCarousel';
+import { SponsorCarousel } from '../components/SponsorCarousel';
 import {
   scheduleStart,
   scheduleEnd,
   SCHEDULE_REVEAL_MESSAGE,
+  SCHEDULE_EVENTS_BLURB,
 } from '@/data/schedule';
 
 export function LandingPage() {
@@ -449,6 +452,7 @@ export function LandingPage() {
           >
             <h2 className="text-4xl mb-4 text-white">Event Schedule</h2>
             <p className="text-white/80">{SCHEDULE_REVEAL_MESSAGE}</p>
+            <p className="text-white/70 mt-3 max-w-2xl mx-auto">{SCHEDULE_EVENTS_BLURB}</p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
@@ -594,45 +598,7 @@ export function LandingPage() {
             <p className="text-white/80">Thank you to our amazing sponsors</p>
           </motion.div>
 
-          <div className="space-y-8">
-            {/* Platinum Sponsors */}
-            <div>
-              <h3 className="text-center text-xl text-white/90 mb-6">Platinum Sponsors</h3>
-              <div className="grid md:grid-cols-3 gap-6">
-                {["TechCorp", "InnovateLabs", "CodeBase"].map((sponsor, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="bg-black/30 backdrop-blur-sm border border-white/20 rounded-xl p-8 flex items-center justify-center h-32 hover:border-white/50 transition-all"
-                  >
-                    <span className="text-2xl text-white">{sponsor}</span>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            {/* Gold Sponsors */}
-            <div>
-              <h3 className="text-center text-xl text-white/90 mb-6">Gold Sponsors</h3>
-              <div className="grid md:grid-cols-4 gap-6">
-                {["StartupHub", "DataStream", "CloudNine", "DevTools"].map((sponsor, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="bg-black/30 backdrop-blur-sm border border-white/20 rounded-xl p-6 flex items-center justify-center h-24 hover:border-white/50 transition-all"
-                  >
-                    <span className="text-lg text-white">{sponsor}</span>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <SponsorCarousel />
         </div>
       </section>
 
@@ -695,24 +661,20 @@ export function LandingPage() {
             <p className="text-white/80">The team making it all happen</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-4 gap-6">
-            {organizers.map((organizer, i) => (
-              <motion.div
+          <SpinningCarousel duration={36}>
+            {organizers.map((organizer) => (
+              <div
                 key={organizer.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-black/30 backdrop-blur-sm border border-white/20 rounded-xl p-6 text-center hover:border-white/50 transition-all"
+                className="bg-black/30 backdrop-blur-sm border border-white/20 rounded-xl p-6 text-center hover:border-white/50 transition-all w-64"
               >
                 <div className="w-20 h-20 rounded-full bg-black flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl text-white">{organizer.avatar}</span>
                 </div>
                 <h3 className="text-lg text-white mb-1">{organizer.name}</h3>
                 <p className="text-sm text-white/80">{organizer.title}</p>
-              </motion.div>
+              </div>
             ))}
-          </div>
+          </SpinningCarousel>
         </div>
       </section>
 
@@ -745,7 +707,7 @@ export function LandingPage() {
       <footer className="bg-black/50 border-t border-white/20 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center text-white/80">
           <p className="mb-2">© 2026 Mule Hacks - University of Central Missouri</p>
-          <p className="text-sm">Questions? Email us at hello@mulehacks.com</p>
+          <p className="text-sm">Questions? Email us at mulehacks2026@gmail.com</p>
         </div>
       </footer>
     </div>

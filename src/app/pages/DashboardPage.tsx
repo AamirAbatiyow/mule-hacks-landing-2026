@@ -41,7 +41,9 @@ import {
   scheduleStart,
   scheduleEnd,
   SCHEDULE_REVEAL_MESSAGE,
+  SCHEDULE_EVENTS_BLURB,
 } from '@/data/schedule';
+import { SponsorCarousel } from '../components/SponsorCarousel';
 
 export function DashboardPage() {
   const [currentView, setCurrentView] = useState('checkin');
@@ -655,34 +657,7 @@ function ResourcesView() {
       content: (
         <div className="space-y-6">
           <h2 className="text-3xl text-white mb-4">Our Sponsors</h2>
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-xl text-white/90 mb-3">Platinum Sponsors</h3>
-              <div className="grid md:grid-cols-3 gap-4">
-                {['TechCorp', 'InnovateLabs', 'CodeBase'].map((sponsor, i) => (
-                  <div
-                    key={i}
-                    className="bg-white/5 border border-white/10 rounded-lg p-6 text-center"
-                  >
-                    <p className="text-white text-xl">{sponsor}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h3 className="text-xl text-white/90 mb-3">Gold Sponsors</h3>
-              <div className="grid md:grid-cols-4 gap-4">
-                {['StartupHub', 'DataStream', 'CloudNine', 'DevTools'].map((sponsor, i) => (
-                  <div
-                    key={i}
-                    className="bg-white/5 border border-white/10 rounded-lg p-4 text-center"
-                  >
-                    <p className="text-white">{sponsor}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <SponsorCarousel emptyClassName="text-white/70" />
         </div>
       ),
     },
@@ -695,6 +670,7 @@ function ResourcesView() {
         <div className="space-y-6">
           <h2 className="text-3xl text-white mb-2">Event Schedule</h2>
           <p className="text-white/70">{SCHEDULE_REVEAL_MESSAGE}</p>
+          <p className="text-white/70">{SCHEDULE_EVENTS_BLURB}</p>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white/5 border border-white/10 rounded-lg p-6">
               <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Arrive</p>
@@ -860,11 +836,14 @@ function ResourcesView() {
       <div className="bg-[#000000] rounded-xl p-6">
         <h3 className="text-white text-lg mb-2">Need Help?</h3>
         <p className="text-white/90 mb-4">
-          Can't find what you're looking for? Reach out to our team at hello@mulehacks.com
+          Can't find what you're looking for? Reach out to our team at mulehacks2026@gmail.com
         </p>
-        <button className="bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg transition-all">
+        <a
+          href="mailto:mulehacks2026@gmail.com"
+          className="inline-block bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg transition-all"
+        >
           Contact Support
-        </button>
+        </a>
       </div>
     </div>
   );
