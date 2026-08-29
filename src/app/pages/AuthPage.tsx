@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
 import muleLogo from '@/data/ucm_mule_logo.png';
 import { apiFetch, ApiError } from '@/lib/api';
+import { SeoHead } from '../components/SeoHead';
 
 export function AuthPage() {
   const [searchParams] = useSearchParams();
@@ -60,6 +61,17 @@ export function AuthPage() {
 
   return (
     <div className="min-h-screen bg-brand flex items-center justify-center px-4 py-8">
+      <SeoHead
+        title={
+          isForgotPassword
+            ? 'Forgot password | Mule Hacks 2026'
+            : isLogin
+              ? 'Sign in | Mule Hacks 2026'
+              : 'Register | Mule Hacks 2026'
+        }
+        description="Sign in or create your Mule Hacks 2026 account to register for the University of Central Missouri hackathon."
+        noIndex
+      />
       <div className="w-full max-w-md relative">
         <motion.button
           initial={{ opacity: 0, x: -20 }}

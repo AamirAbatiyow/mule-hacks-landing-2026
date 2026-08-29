@@ -5,6 +5,7 @@ import { useState } from 'react';
 import organizers from '@/data/organizers.json';
 import { SpinningCarousel } from '../components/SpinningCarousel';
 import { SponsorCarousel } from '../components/SponsorCarousel';
+import { SeoHead } from '../components/SeoHead';
 import {
   scheduleStart,
   scheduleEnd,
@@ -17,8 +18,12 @@ export function LandingPage() {
 
   return (
     <div className="min-h-screen bg-brand">
+      <SeoHead
+        title="Mule Hacks 2026 | University of Central Missouri Hackathon"
+        description="Mule Hacks 2026 is a free 24-hour student hackathon at the University of Central Missouri in Warrensburg, MO on October 3–4, 2026. Register to build, learn, and compete."
+      />
       {/* Hero Section */}
-      <nav className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/20">
+      <nav aria-label="Primary" className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <motion.div
@@ -104,6 +109,7 @@ export function LandingPage() {
         </AnimatePresence>
       </nav>
 
+      <main>
       <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         {/* Tech Background Graphics */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -702,12 +708,18 @@ export function LandingPage() {
           </Link>
         </motion.div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer className="bg-black/50 border-t border-white/20 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center text-white/80">
           <p className="mb-2">© 2026 Mule Hacks - University of Central Missouri</p>
-          <p className="text-sm">Questions? Email us at mulehacks2026@gmail.com</p>
+          <p className="text-sm">
+            Questions? Email us at{" "}
+            <a className="underline decoration-white/40 hover:decoration-white" href="mailto:mulehacks2026@gmail.com">
+              mulehacks2026@gmail.com
+            </a>
+          </p>
         </div>
       </footer>
     </div>
@@ -727,7 +739,9 @@ function FAQItem({ faq, index }: { faq: { q: string; a: string }; index: number 
       className="bg-black/30 backdrop-blur-sm border border-white/20 rounded-xl overflow-hidden hover:border-white/50 transition-all"
     >
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
         className="w-full p-6 flex items-center justify-between text-left group"
       >
         <h3 className="text-lg text-white group-hover:text-[#d4af37] transition-colors pr-4">

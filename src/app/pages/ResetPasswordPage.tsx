@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { Lock, ArrowLeft } from 'lucide-react';
 import muleLogo from '@/data/ucm_mule_logo.png';
 import { apiFetch, ApiError } from '@/lib/api';
+import { SeoHead } from '../components/SeoHead';
 
 export function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -47,6 +48,11 @@ export function ResetPasswordPage() {
 
   return (
     <div className="min-h-screen bg-brand flex items-center justify-center px-4 py-8">
+      <SeoHead
+        title="Set a new password | Mule Hacks 2026"
+        description="Reset your Mule Hacks 2026 account password."
+        noIndex
+      />
       <div className="w-full max-w-md relative">
         <motion.button
           initial={{ opacity: 0, x: -20 }}

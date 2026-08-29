@@ -36,7 +36,7 @@ export function SponsorCarousel({ emptyClassName = "text-center text-white/70" }
         );
 
         return sponsor.url ? (
-          <a key={sponsor.name} href={sponsor.url} target="_blank" rel="noreferrer" className="block">
+          <a key={sponsor.name} href={sponsor.url} target="_blank" rel="noopener noreferrer" className="block">
             {card}
           </a>
         ) : (

@@ -44,6 +44,7 @@ import {
   SCHEDULE_EVENTS_BLURB,
 } from '@/data/schedule';
 import { SponsorCarousel } from '../components/SponsorCarousel';
+import { SeoHead } from '../components/SeoHead';
 
 export function DashboardPage() {
   const [currentView, setCurrentView] = useState('checkin');
@@ -66,6 +67,11 @@ export function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-brand">
+      <SeoHead
+        title="Dashboard | Mule Hacks 2026"
+        description="Your Mule Hacks 2026 attendee dashboard."
+        noIndex
+      />
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 w-full z-50 bg-[#000000]/90 backdrop-blur-md border-b border-white/20">
         <div className="flex items-center justify-between px-4 h-16">

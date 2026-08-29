@@ -12,6 +12,7 @@ import { useAuth } from "../../context/AuthContext";
 import { AnnouncementManager } from "./AnnouncementManager";
 import { UsersList } from "./UsersList";
 import { TeamsList } from "./TeamsList";
+import { SeoHead } from "../SeoHead";
 
 type AdminTab = "dashboard" | "announcements" | "users" | "teams";
 
@@ -29,6 +30,11 @@ export function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-brand flex flex-col lg:flex-row">
+      <SeoHead
+        title="Admin | Mule Hacks 2026"
+        description="Mule Hacks 2026 organizer admin dashboard."
+        noIndex
+      />
       <aside className="w-full lg:w-64 border-b lg:border-b-0 lg:border-r border-white/20 bg-black/40 backdrop-blur-md flex-shrink-0 lg:flex lg:flex-col">
         <div className="p-4 border-b border-white/10">
           <p className="text-white/50 text-xs uppercase tracking-wider">Mule Hacks</p>

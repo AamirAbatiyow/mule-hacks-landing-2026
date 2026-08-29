@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { motion } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
+import { SeoHead } from '../components/SeoHead';
 import { User, GraduationCap, BookOpen, Phone, Github, Linkedin, ChevronRight } from 'lucide-react';
 
 const TOTAL_STEPS = 5;
@@ -66,6 +67,11 @@ export function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-brand flex items-center justify-center px-4 py-8">
+      <SeoHead
+        title="Onboarding | Mule Hacks 2026"
+        description="Complete your Mule Hacks 2026 registration profile."
+        noIndex
+      />
       <div className="w-full max-w-lg relative">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
