@@ -43,6 +43,7 @@ import {
   SCHEDULE_REVEAL_MESSAGE,
   SCHEDULE_EVENTS_BLURB,
 } from '@/data/schedule';
+import { DISCORD_URL, EVENT_CAMPUS, EVENT_CITY, EVENT_VENUE } from '@/data/links';
 import { SponsorCarousel } from '../components/SponsorCarousel';
 import { SeoHead } from '../components/SeoHead';
 
@@ -677,6 +678,9 @@ function ResourcesView() {
           <h2 className="text-3xl text-white mb-2">Event Schedule</h2>
           <p className="text-white/70">{SCHEDULE_REVEAL_MESSAGE}</p>
           <p className="text-white/70">{SCHEDULE_EVENTS_BLURB}</p>
+          <p className="text-white/70">
+            {EVENT_VENUE}, {EVENT_CAMPUS}, {EVENT_CITY}
+          </p>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white/5 border border-white/10 rounded-lg p-6">
               <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Arrive</p>
@@ -843,13 +847,24 @@ function ResourcesView() {
         <h3 className="text-white text-lg mb-2">Need Help?</h3>
         <p className="text-white/90 mb-4">
           Can't find what you're looking for? Reach out to our team at mulehacks2026@gmail.com
+          or join the official Discord.
         </p>
-        <a
-          href="mailto:mulehacks2026@gmail.com"
-          className="inline-block bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg transition-all"
-        >
-          Contact Support
-        </a>
+        <div className="flex flex-wrap gap-3">
+          <a
+            href="mailto:mulehacks2026@gmail.com"
+            className="inline-block bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg transition-all"
+          >
+            Contact Support
+          </a>
+          <a
+            href={DISCORD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg transition-all"
+          >
+            Join Discord
+          </a>
+        </div>
       </div>
     </div>
   );

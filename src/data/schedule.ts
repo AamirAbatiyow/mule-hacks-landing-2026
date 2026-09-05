@@ -21,7 +21,7 @@ export const scheduleStart: ScheduleBound = {
 export const scheduleEnd: ScheduleBound = {
   day: 'Day 2',
   date: 'October 4',
-  time: '4:00 PM',
+  time: '5:00 PM',
   event: 'Awards Ceremony',
 };
 

@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar, Trophy, Users, ChevronRight, Sparkles, Code2, Zap, Award, Clock, MapPin, ChevronDown, Menu, X } from 'lucide-react';
+import { Calendar, Trophy, Users, ChevronRight, Sparkles, Code2, Zap, Award, Clock, MapPin, ChevronDown, Menu, X, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import organizers from '@/data/organizers.json';
 import { SpinningCarousel } from '../components/SpinningCarousel';
@@ -12,6 +12,7 @@ import {
   SCHEDULE_REVEAL_MESSAGE,
   SCHEDULE_EVENTS_BLURB,
 } from '@/data/schedule';
+import { DISCORD_URL, EVENT_CAMPUS, EVENT_CITY, EVENT_VENUE } from '@/data/links';
 
 export function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -20,7 +21,7 @@ export function LandingPage() {
     <div className="min-h-screen bg-brand">
       <SeoHead
         title="Mule Hacks 2026 | University of Central Missouri Hackathon"
-        description="Mule Hacks 2026 is a free 24-hour student hackathon at the University of Central Missouri in Warrensburg, MO on October 3–4, 2026. Register to build, learn, and compete."
+        description="Mule Hacks 2026 is a free 24-hour student hackathon at the W.C. Morris Science Building on the University of Central Missouri campus in Warrensburg, MO on October 3–4, 2026. Register to build, learn, and compete."
       />
       {/* Hero Section */}
       <nav aria-label="Primary" className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/20">
@@ -45,6 +46,14 @@ export function LandingPage() {
               <a href="#prizes" className="text-white/80 hover:text-white transition-colors">Prizes</a>
               <a href="#sponsors" className="text-white/80 hover:text-white transition-colors">Sponsors</a>
               <a href="#faq" className="text-white/80 hover:text-white transition-colors">FAQ</a>
+              <a
+                href={DISCORD_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                Discord
+              </a>
             </motion.div>
 
             {/* Mobile Menu Button */}
@@ -97,6 +106,15 @@ export function LandingPage() {
                   className="block text-white/80 hover:text-white transition-colors py-2"
                 >
                   FAQ
+                </a>
+                <a
+                  href={DISCORD_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-white/80 hover:text-white transition-colors py-2"
+                >
+                  Discord
                 </a>
                 <Link to="/auth?mode=register" onClick={() => setMobileMenuOpen(false)}>
                   <button className="w-full bg-[#6b0000] hover:bg-[#8b0000] text-white px-6 py-3 rounded-lg transition-all mt-2">
@@ -373,21 +391,25 @@ export function LandingPage() {
                 </motion.button>
               </Link>
 
-              <div className="flex items-center gap-4 text-white/90">
+              <div className="flex flex-col sm:flex-row items-center gap-4 text-white/90">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-white" />
                   <span>October 3-4, 2026</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-white" />
-                  <span>Warrensburg, MO</span>
+                <div className="flex items-start gap-2 text-left max-w-sm">
+                  <MapPin className="w-5 h-5 text-white shrink-0 mt-0.5" />
+                  <span>
+                    {EVENT_VENUE}
+                    <br />
+                    {EVENT_CAMPUS}, {EVENT_CITY}
+                  </span>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
               {[
-                { icon: Users, label: "150+ Hackers", color: "from-red-500 to-orange-500" },
+                { icon: Users, label: "100+ Hackers", color: "from-red-500 to-orange-500" },
                 { icon: Trophy, label: "$1K+ Prizes", color: "from-orange-500 to-yellow-500" },
                 { icon: Clock, label: "24 Hours", color: "from-yellow-500 to-red-500" },
                 { icon: Zap, label: "10+ Mentors", color: "from-red-500 to-pink-500" },
@@ -459,6 +481,9 @@ export function LandingPage() {
             <h2 className="text-4xl mb-4 text-white">Event Schedule</h2>
             <p className="text-white/80">{SCHEDULE_REVEAL_MESSAGE}</p>
             <p className="text-white/70 mt-3 max-w-2xl mx-auto">{SCHEDULE_EVENTS_BLURB}</p>
+            <p className="text-white/70 mt-3 max-w-2xl mx-auto">
+              {EVENT_VENUE}, {EVENT_CAMPUS}, {EVENT_CITY}
+            </p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
@@ -714,10 +739,23 @@ export function LandingPage() {
       <footer className="bg-black/50 border-t border-white/20 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center text-white/80">
           <p className="mb-2">© 2026 Mule Hacks - University of Central Missouri</p>
+          <p className="text-sm mb-2">
+            {EVENT_VENUE}, {EVENT_CITY}
+          </p>
           <p className="text-sm">
             Questions? Email us at{" "}
             <a className="underline decoration-white/40 hover:decoration-white" href="mailto:mulehacks2026@gmail.com">
               mulehacks2026@gmail.com
+            </a>
+            {" · "}
+            <a
+              className="underline decoration-white/40 hover:decoration-white inline-flex items-center gap-1"
+              href={DISCORD_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              Join the Discord
             </a>
           </p>
         </div>
